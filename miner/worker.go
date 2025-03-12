@@ -675,6 +675,7 @@ func (w *worker) opLoop() {
 	for {
 		select {
 		case req := <-w.getWorkCh:
+			req.params.forceTime = false
 			req.result <- w.generateWork(req.params)
 		case <-w.exitCh:
 			return
@@ -1192,13 +1193,17 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 	}
 	// Sanity check the timestamp correctness, recap the timestamp
 	// to parent+1 if the mutation is allowed.
-	timestamp := genParams.timestamp
-	if parent.Time >= timestamp {
-		if genParams.forceTime {
-			return nil, fmt.Errorf("invalid timestamp, parent %d given %d", parent.Time, timestamp)
+	/*
+		timestamp := genParams.timestamp
+		if parent.Time >= timestamp {
+			if genParams.forceTime {
+				return nil, fmt.Errorf("invalid timestamp, parent %d given %d", parent.Time, timestamp)
+			}
+			timestamp = parent.Time + 1
 		}
-		timestamp = parent.Time + 1
-	}
+	*/
+	timestamp := parent.Time + 1
+	//timestamp := parent.Time
 	// Construct the sealing block header.
 	header := &types.Header{
 		ParentHash: parent.Hash(),
