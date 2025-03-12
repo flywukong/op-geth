@@ -350,6 +350,8 @@ func (w *worker) buildPayload(args *BuildPayloadArgs) (*Payload, error) {
 			return nil, err
 		}
 	*/
+
+	blockTime := 500 * time.Millisecond
 	//check state of parent block
 	_, err := w.retrieveParentState(fullParams)
 	if err != nil && strings.Contains(err.Error(), "missing trie node") {

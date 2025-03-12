@@ -1201,8 +1201,9 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 			}
 			timestamp = parent.Time + 1
 		}
-
 	*/
+	timestamp := parent.Time + 1
+	//timestamp := parent.Time
 	// Construct the sealing block header.
 	header := &types.Header{
 		ParentHash: parent.Hash(),
