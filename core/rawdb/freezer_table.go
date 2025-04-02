@@ -179,6 +179,8 @@ func newTable(path string, name string, readMeter metrics.Meter, writeMeter metr
 		readonly:      readonly,
 		maxFileSize:   maxFilesize,
 	}
+	log.Info("debug123: freeze table info:", "index:", index, "meta", meta,
+		"name", name, "path:", path, "max file size", maxFilesize)
 	if err := tab.repair(); err != nil {
 		tab.Close()
 		return nil, err
@@ -251,7 +253,7 @@ func (t *freezerTable) repair() error {
 		return err
 	}
 	t.itemHidden.Store(meta.VirtualTail)
-
+	log.Info("debug123 set item hidden:", "item hidden", meta.VirtualTail, "table:", t.name)
 	// Read the last index, use the default value in case the freezer is empty
 	if offsetsSize == indexEntrySize {
 		lastIndex = indexEntry{filenum: t.tailId, offset: 0}
@@ -397,6 +399,7 @@ func (t *freezerTable) truncateHead(items uint64) error {
 	if existing <= items {
 		return nil
 	}
+	log.Info("debug123: tables item compare", "items:", items, "itemHidden:", t.itemHidden.Load())
 	if items < t.itemHidden.Load() {
 		return errors.New("truncation below tail")
 	}
@@ -517,6 +520,7 @@ func (t *freezerTable) truncateTail(items uint64) error {
 	}
 	// Update the virtual tail marker and hidden these entries in table.
 	t.itemHidden.Store(items)
+	log.Info("debug123 set item hidden v2:", "iten hidden", items, "table:", t.name)
 	if err := writeMetadata(t.meta, newMetadata(items)); err != nil {
 		return err
 	}
